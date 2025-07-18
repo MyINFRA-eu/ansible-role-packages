@@ -66,12 +66,175 @@ None.
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
-```
-var1: true
-var2: "string"
-var3: []
+### autoclean
+
+Auto cleanup repositories of old package information.
+
+> value needs to be a boolean (true|false)
+
+**example:**
+```yml
+packages:
+  autoclean: false
 ```
 
+### autoremove
+
+Auto remove unused packages from the system.
+
+> value needs to be a boolean (true|false)
+
+**example:**
+```yml
+packages:
+  autoremove: false
+```
+
+### recommends
+
+Install recommended packages.
+
+> value needs to be a boolean (true|false)
+
+**example:**
+```yml
+packages:
+  recommends: false
+```
+
+### upgrade
+
+Upgrade system to newer version.
+
+Values:
+- no = leave the system alone
+- dist = perform a dist-upgrade
+- full = perform a full-upgrade
+- yes or safe = perform a safe-upgrade
+
+**example:**
+```yml
+packages:
+  upgrade: "no"
+```
+
+### state
+
+The state of the installed packages.
+
+Values:
+- present = make sure the package is installed
+- latest = make sure the package has the latest version and is updated
+
+**example:**
+```yml
+packages:
+  state: "present"
+```
+
+### Cache settings
+
+Set if cache is being used and for how long the cache is valid.
+
+#### update
+
+Update cache before installing new packages.
+
+> value needs to be a boolean (true|false).
+
+#### time
+
+> value needs to be a integer, for example "3600" means 3600 seconds or 1 hour.
+
+**example:**
+```yml
+packages:
+  cache:
+    update: true
+    time: 3600
+```
+
+### install
+
+List of packages to install that need to be installed on the system.
+
+> Value needs to be a array list.
+
+**example:**
+```yml
+packages:
+  install:
+    - "sshd"
+    - "curl"
+    - "htop"
+```
+
+### remove
+
+List of packages to be removed from the system.
+
+> Value needs to be a array list.
+
+**example:**
+```yml
+packages:
+  install:
+    - "laptop-detect"
+```
+
+### services
+
+Check if services are enabled/disable and running/stopped
+
+#### enabled
+
+Make sure the services is enabled or disabled on startup
+
+> value needs to be a boolean (true|false).
+
+### state
+
+Make sure the service is running or stopped or ...
+
+Values:
+- reloaded
+- restarted
+- started
+- stopped
+
+**example:**
+```yml
+packages:
+  services:
+    sshd:
+      enabled: true
+      state: "started"
+```
+
+### Full example
+
+**example:**
+```yml
+packages:
+  autoclean: false
+  autoremove: false
+  recommends: false
+  upgrade: "no"
+  state: "present"
+  cache:
+    update: true
+    time: 3600
+  install:
+    - "sshd"
+    - "htop"
+    - "curl"
+  remove:
+    - "laptop-detect"
+  services:
+    sshd:
+      enabled: true
+      state: "started"
+```
 
 ## Dependencies
 
