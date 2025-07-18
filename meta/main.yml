@@ -2,10 +2,10 @@
 dependencies: []
 
 galaxy_info:
-  role_name: "name"
+  role_name: "packages"
   namespace: "myinfra_eu"
   author: "Dennis-de-Houx"
-  description: "<description>."
+  description: "Ansible role to install default packages (apt based)."
   company: "All In One - MyINFRA.eu"
   license: "CC BY-NC-ND 4.0"
   issue_tracker_url: https://github.com/MyINFRA-eu/<name>/issues
@@ -16,12 +16,7 @@ galaxy_info:
         - all
     - name: Ubuntu
       versions:
-        - jammy
-        - noble
+        - all
   galaxy_tags:
-    - php
-    - web
-    - drupal
-    - vm
-    - magento
-    - wordpress
+    - packages
+    - apt

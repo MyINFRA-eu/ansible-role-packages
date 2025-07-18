@@ -1,7 +1,7 @@
 ---
 #####
 #
-# @name MyINFRA.eu ~ Ansible <name> Role
+# @name MyINFRA.eu ~ Ansible Packages Role
 # @version 2025.07-001
 # @since 2025.07-001
 #
@@ -11,6 +11,50 @@
 #
 ###
 #
-# Ansible defaults for <name>
+# Ansible defaults for packages
 #
 #####
+
+packages:
+  ### Auto cleanup repositories of old package information
+  autoclean: false
+
+  ### Auto remove unused packages from the system
+  autoremove: false
+
+  ### Install recommended packages
+  recommends: false
+
+  ### Upgrade system to newer version
+  ### - no = leave the system alone
+  ### - dist = perform a dist-upgrade
+  ### - full = perform a full-upgrade
+  ### - yes or safe = perform a safe-upgrade
+  upgrade: "no"
+
+  ### The state of the installed packages
+  ### - present = make sure the package is installed
+  ### - latest = make sure the package has the latest version and is updated
+  state: "present"
+
+  ### Cache settings
+  cache:
+    ### Update cache before installing new packages
+    update: true
+
+    ### How long to keep cache alive until refresh
+    time: 3600
+
+  ### Packages to install
+  install: []
+
+  ### Packages to remove
+  remove: []
+
+  ### Check if services are enabled/disable and running/stopped
+  ### enabled: true or false
+  ### state: reloaded, restarted, started, stopped
+  services:
+    sshd:
+      enabled: true
+      state: "started"

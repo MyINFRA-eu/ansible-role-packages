@@ -1,7 +1,7 @@
 ---
 #####
 #
-# @name MyINFRA.eu ~ Ansible <name> Role
+# @name MyINFRA.eu ~ Ansible Packages Role
 # @version 2025.07-001
 # @since 2025.07-001
 #
@@ -11,20 +11,105 @@
 #
 ###
 #
-# Ansible role for <description>
+# Ansible role to install default packages on debian based systems (apt)
 #
 #####
 
 - name: "Copyright & Version information"
   ansible.builtin.debug:
     msg:
-      - "MyINFRA.eu ~ Ansible <name> Role"
-      - "Version   : 2025.07-001"
+      - "MyINFRA.eu ~ Ansible Packages Role"
+      - "Version   : {{ myinfra.packages.version }}"
       - "Copyright : (c) 2025 (and beyond) - Dennis de Houx, All In One, One For The code"
       - "Author    : Dennis de Houx <dennis@dehoux.be>"
       - "License   : https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en CC BY-NC-ND 4.0"
 
-- name: "Load: Gather facts tasks"
-  ansible.builtin.import_tasks: gather.yml
+- name: "PACKAGES > Convert services dictionary to list"
+  ansible.builtin.set_fact:
+    services_list: "{{ services_list | default([]) + [{'name': service_name} | combine(service_settings)] }}"
+  loop: "{{ packages.services | default({}) | dict2items }}"
+  vars:
+    service_name: "{{ item.key }}"
+    service_settings: "{{ item.value }}"
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - packages.services is defined and packages.services | length > 0
+
+- name: "PACKAGES > Clean repository"
+  ansible.builtin.apt:
+    autoclean: true
+  become: true
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - packages.autoclean is true
   tags:
-    - <short_name>_gather_facts
+    - packages_autoclean
+
+- name: "PACKAGES > Autoremove unused packages"
+  ansible.builtin.apt:
+    autoremove: true
+    fail_on_autoremove: true
+  become: true
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - packages.autoremove is true
+  tags:
+    - packages_autoremove
+
+- name: "PACKAGES > Upgrade system packages"
+  ansible.builtin.apt:
+    upgrade: "{{ packages.upgrade | default('no') }}"
+    state: "{{ packages.state | default('present') }}"
+    update_cache: "{{ packages.cache.update | default(true) }}"
+    cache_valid_time: "{{ packages.cache.time | default(3600) }}"
+    install_recommends: "{{ packages.recommends | default(false) }}"
+  become: true
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - packages.upgrade is defined and packages.upgrade | length > 0
+  tags:
+    - packages_upgrade
+
+- name: "PACKAGES > Install packages"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: "{{ packages.state | default('present') }}"
+    update_cache: "{{ packages.cache.update | default(true) }}"
+    cache_valid_time: "{{ packages.cache.time | default(3600) }}"
+    install_recommends: "{{ packages.recommends | default(false) }}"
+  become: true
+  loop: "{{ packages.install | default([]) }}"
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - packages.install is defined and packages.install | length > 0
+  tags:
+    - packages_install
+
+- name: "PACKAGES > Remove packages"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    autoremove: "{{ packages.autoremove | default(false) }}"
+    fail_on_autoremove: true
+    update_cache: "{{ packages.cache.update | default(true) }}"
+    cache_valid_time: "{{ packages.cache.time | default(3600) }}"
+  become: true
+  loop: "{{ packages.remove | default([]) }}"
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - packages.remove is defined and packages.remove | length > 0
+  tags:
+    - packages_remove
+
+- name: "PACKAGES > Validate services are enabled and/or running"
+  ansible.builtin.service:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('started') }}"
+    enabled: "{{ item.enabled | default(true) }}"
+  become: true
+  loop: "{{ packages.services | default([]) }}"
+  when:
+    - ansible_facts['os_family'] == "Debian"
+    - packages.services is defined and packages.services | length > 0
+  tags:
+    - packages_services

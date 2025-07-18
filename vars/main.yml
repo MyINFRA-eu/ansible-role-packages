@@ -1,7 +1,7 @@
 ---
 #####
 #
-# @name MyINFRA.eu ~ Ansible <name> Role
+# @name MyINFRA.eu ~ Ansible Packages Role
 # @version 2025.07-001
 # @since 2025.07-001
 #
@@ -11,6 +11,11 @@
 #
 ###
 #
-# Ansible variables for <name>
+# Ansible variables for packages
 #
 #####
+
+### Role version
+myinfra:
+  packages:
+    version: "2025.07.001"
